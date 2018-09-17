@@ -14,6 +14,7 @@ module.exports = class Router {
       let match = url.exec(path)
       if(!match || request.method != method) continue;
       let urlParts = match.slice(1).map(decodeURIComponent);
+      //context is the server instance
       return handler(context, ...urlParts, request);
     }
     return null;
