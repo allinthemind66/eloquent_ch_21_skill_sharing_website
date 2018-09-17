@@ -104,3 +104,14 @@ router.add("POST", /^\/talks\/([^\/]+)\/comments$/, async (server, title, reques
     return {status: 404, body: `No talk '${title}' found.`}
   }
 });
+
+SkillShareServer.prototype.talkResponse = function() {
+  let talks = [];
+  for(let title of Object.keys(this.talks)) {
+    talks.push(this.talks[title])
+  }
+  return {
+    body: JSON.stringify(talks),
+    headers: {"Content-Type": "application/json", "ETag": `"${this.version}"`}
+  }
+}
