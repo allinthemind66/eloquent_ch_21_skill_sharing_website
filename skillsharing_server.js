@@ -115,3 +115,15 @@ SkillShareServer.prototype.talkResponse = function() {
     headers: {"Content-Type": "application/json", "ETag": `"${this.version}"`}
   }
 }
+
+router.add("GET", /^\/talks$/, async (server, request) => {
+  let tag = /"(.*)"/.exec(request.headers["if-none-match"]);
+  let wait = /\bwait=(\d+)/.exec(request.header["prefer"]);
+  if(!tag || tag[1] != server.version) {
+    return server.talkResponse()
+  } else if (!wait) {
+    return {status: 304}
+  } else {
+    return server.waitForChanges(Number(wait[1]));
+  }
+});
