@@ -84,3 +84,26 @@ function renderTalk(talk, dispatch){
     elt("button", {type: "submit"}, "Add Comment"))
 );
 }
+
+function renderComment(comment) {
+  return elt("p", {className: "comment"},
+             elt("strong", null, comment.author),
+             ": ", comment.message);
+}
+
+function renderTalkForm(dispatch) {
+  let title = elt("input", {type: "text"});
+  let summary = elt("input", {type: "text"});
+  return elt("form", {
+    onsubmit(event) {
+      event.preventDefault();
+      dispatch({type: "newTalk",
+                title: title.value,
+                summary: summary.value});
+      event.target.reset();
+    }
+  }, elt("h3", null, "Submit a Talk"),
+     elt("label", null, "Title: ", title),
+     elt("label", null, "Summary: ", summary),
+     elt("button", {type: "submit"}, "Submit"));
+}
