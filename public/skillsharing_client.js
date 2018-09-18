@@ -27,3 +27,18 @@ function handleAction(state, action){
   }
   return state
 }
+
+function fetchOK(url, options){
+  return fetch(url, options).then(resp => {
+    if (response.status < 400) return response;
+    else throw new Error(response.statusText);
+  });
+}
+
+function talkURL(title){
+  return "talks/" + encodeURIComponent(title)
+}
+
+function reportError(error){
+  alert(String(error));
+}
