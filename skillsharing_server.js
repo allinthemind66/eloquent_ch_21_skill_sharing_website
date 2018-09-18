@@ -127,3 +127,12 @@ router.add("GET", /^\/talks$/, async (server, request) => {
     return server.waitForChanges(Number(wait[1]));
   }
 });
+
+SkillShareServer.prototype.updated = function(){
+  this.version++;
+  let response = this.talkResponse();
+  this.waiting.forEach(resolve => resolve(response));
+  this.waiting = [];
+};
+
+new SkillShareServer(Object.create(null)).start(8000);
