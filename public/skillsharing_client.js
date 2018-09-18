@@ -62,3 +62,25 @@ function renderUserField(name, dispatch){
     }
   }));
 }
+
+function renderTalk(talk, dispatch){
+  return elt("section", {className: "talk"}, elt("h2", null, talk.title, " ", elt("button", {
+    type: "button",
+    onclick() {
+      dispatch({type: "deleteTalk", talk: talk.title});
+    }
+  }, "delete")),
+  elt("div", null, "by ", elt("strong", null, talk.presenter)),
+  elt("p", null, talk.summary),
+  ...talk.comments.map(renderComment),
+  elt("form", {
+    onsubmit(event) {
+      event.preventDefault();
+      let form = event.target;
+      dispatch({type: "newComment", talk: talk.title, message: form.elements.comment.value});
+      form.reset();
+    }
+  }, elt("input", {type: "text", name: "comment"}), " ",
+    elt("button", {type: "submit"}, "Add Comment"))
+);
+}
