@@ -28,8 +28,15 @@ function handleAction(state, action){
   return state
 }
 
-function fetchOK(url, options){
-  return fetch(url, options).then(resp => {
+// function fetchOK(url, options){
+//   return fetch(url, options).then(response => {
+//     if (response.status < 400) return response;
+//     else throw new Error(response.statusText);
+//   });
+// }
+function fetchOK(url, options) {
+  console.log('these are the vistas', url)
+  return fetch(url, options).then(response => {
     if (response.status < 400) return response;
     else throw new Error(response.statusText);
   });
@@ -108,22 +115,84 @@ function renderTalkForm(dispatch) {
      elt("button", {type: "submit"}, "Submit"));
 }
 
+// async function pollTalks(update) {
+//   let tag = undefined;
+//   for(;;){
+//     let response;
+//     try {
+//       response = await fetchOK("/talks", {
+//         headers: tag && {"If-None-Match": tag, "Prefer": "wait=90"}
+//       });
+//     } catch(e) {
+//       console.log("Request failed: " + e);
+//       await new Promise(resolve => setTimeout(resolve, 500));
+//       continue
+//     }
+//     if (response.status == 304) continue;
+//     tag = response.headers.get("ETag");
+//     update(await response.json())
+//     // console.log(response)
+//   }
+// }
 async function pollTalks(update) {
   let tag = undefined;
-  for(;;){
+  for (;;) {
     let response;
     try {
       response = await fetchOK("/talks", {
-        headers: tag && {"If-None-Match": tag, "Prefer": "wait=90"}
+        headers: tag && {"If-None-Match": tag,
+                         "Prefer": "wait=90"}
       });
     } catch(e) {
       console.log("Request failed: " + e);
       await new Promise(resolve => setTimeout(resolve, 500));
-      continue
+      continue;
     }
     if (response.status == 304) continue;
     tag = response.headers.get("ETag");
-    update(await response.json())
-    console.log(response)
+    update(await response.json());
   }
 }
+
+class SkillShareApp {
+  constructor(state, dispatch){
+    this.dispatch = dispatch;
+    this.talkDOM = elt("div", {className: "talks"});
+    this.dom = elt("div", null,
+    renderUserField(state.user, dispatch),
+  this.talkDOM,
+  renderTalkForm(dispatch));
+  this.syncState(state)
+  }
+  syncState(state){
+    if(state.talks != this.talks) {
+      this.talkDOM.textContent = "";
+      for (let talk of state.talks){
+        this.talkDOM.appendChild(
+          renderTalk(talk, this.dispatch))
+      }
+      this.talks = state.talks
+    }
+  }
+}
+
+function runApp(){
+  let user = localStorage.getItem("userName" || "Anon")
+  let state, app;
+  function dispatch(action){
+    state = handleAction(state, action);
+    app.syncState(state);
+  }
+
+  pollTalks(talks => {
+    if (!app){
+      state = {user, talks};
+      app = new SkillShareApp(state, dispatch);
+      document.body.appendChild(app.dom)
+    } else {
+      dispatch({type: "setTalks", talks});
+    }
+  }).catch(reportError)
+}
+
+runApp()

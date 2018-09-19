@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/allinthemind66/eloquent_ch_21_skill_sharing_website/issues"
   },
-  "homepage": "https://github.com/allinthemind66/eloquent_ch_21_skill_sharing_website#readme"
+  "homepage": "https://github.com/allinthemind66/eloquent_ch_21_skill_sharing_website#readme",
+  "dependencies": {
+    "http": "0.0.0"
+  }
 }
