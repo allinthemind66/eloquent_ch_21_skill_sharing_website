@@ -118,7 +118,7 @@ SkillShareServer.prototype.talkResponse = function() {
 
 router.add("GET", /^\/talks$/, async (server, request) => {
   let tag = /"(.*)"/.exec(request.headers["if-none-match"]);
-  let wait = /\bwait=(\d+)/.exec(request.header["prefer"]);
+  let wait = /\bwait=(\d+)/.exec(request.headers["prefer"]);
   if(!tag || tag[1] != server.version) {
     return server.talkResponse()
   } else if (!wait) {
